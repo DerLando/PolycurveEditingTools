@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\PolycurveEditGrip.cs" />
     <Compile Include="PolycurveEditingToolsCommand.cs" />
     <Compile Include="PolycurveEditingToolsPlugIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
