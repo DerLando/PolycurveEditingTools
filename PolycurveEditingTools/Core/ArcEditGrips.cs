@@ -19,8 +19,8 @@ namespace PolycurveEditingTools.Core
         public ArcEditGrips()
         {
             _drawArc = false;
-            _editGrips = new ArcEditGrip[3];
-            for (int i = 0; i < 3; i++)
+            _editGrips = new ArcEditGrip[5];
+            for (int i = 0; i < 5; i++)
             {
                 _editGrips[i] = new ArcEditGrip();
             }
@@ -36,12 +36,14 @@ namespace PolycurveEditingTools.Core
             _activeArc = arcCrv.Arc;
 
             // set edit grips from arcCrv
-            _editGrips[0] = new ArcEditGrip(arcCrv.PointAtStart);
-            _editGrips[1] = new ArcEditGrip(arcCrv.Arc.MidPoint);
-            _editGrips[2] = new ArcEditGrip(arcCrv.PointAtEnd);
+            _editGrips[0] = new ArcEditGrip(new Point3d(arcCrv.PointAtStart - arcCrv.TangentAtStart * Math.Sqrt(arcCrv.GetLength() / 1.0)));
+            _editGrips[1] = new ArcEditGrip(arcCrv.PointAtStart);
+            _editGrips[2] = new ArcEditGrip(arcCrv.Arc.MidPoint);
+            _editGrips[3] = new ArcEditGrip(arcCrv.PointAtEnd);
+            _editGrips[4] = new ArcEditGrip(new Point3d(arcCrv.PointAtEnd + arcCrv.TangentAtEnd * Math.Sqrt(arcCrv.GetLength() / 1.0)));
 
             // Add grips
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
                 AddGrip(_editGrips[i]);
             }
@@ -55,11 +57,11 @@ namespace PolycurveEditingTools.Core
 
             int activeIndex = -1;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (_editGrips[i].IsActive && _editGrips[i].Moved)
                 {
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j < 5; j++)
                     {
                         if (!_editGrips[j].Moved) _editGrips[j].IsActive = false;
                     }
@@ -75,19 +77,30 @@ namespace PolycurveEditingTools.Core
                 case -1:
                     return;
                 case 0:
-                    // point at start of arc
-                    _activeArc = new Arc(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation,
-                        _editGrips[2].CurrentLocation);
+                    // tangent handle at start
+                    _activeArc = new Arc(_editGrips[1].CurrentLocation,
+                        _editGrips[1].CurrentLocation - _editGrips[0].CurrentLocation, _editGrips[3].CurrentLocation);
                     break;
                 case 1:
-                    // mid-point of arc
-                    _activeArc = new Arc(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation,
-                        _editGrips[2].CurrentLocation);
+                    // point at start of arc
+                    _activeArc = new Arc(_editGrips[1].CurrentLocation, _editGrips[2].CurrentLocation,
+                        _editGrips[3].CurrentLocation);
                     break;
                 case 2:
+                    // mid-point of arc
+                    _activeArc = new Arc(_editGrips[1].CurrentLocation, _editGrips[2].CurrentLocation,
+                        _editGrips[3].CurrentLocation);
+                    break;
+                case 3:
                     // point at end of arc
-                    _activeArc = new Arc(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation,
-                        _editGrips[2].CurrentLocation);
+                    _activeArc = new Arc(_editGrips[1].CurrentLocation, _editGrips[2].CurrentLocation,
+                        _editGrips[3].CurrentLocation);
+                    break;
+                case 4:
+                    // tangent handle at end
+                    _activeArc = new Arc(_editGrips[3].CurrentLocation,
+                        _editGrips[3].CurrentLocation - _editGrips[4].CurrentLocation, _editGrips[1].CurrentLocation);
+                    _activeArc = new Arc(_activeArc.EndPoint, _activeArc.MidPoint, _activeArc.StartPoint);
                     break;
                 default:
                     throw new ArgumentException($"{activeIndex} was not between -1 and 3 :(");
@@ -117,6 +130,8 @@ namespace PolycurveEditingTools.Core
             if (_drawArc && args.DrawDynamicStuff)
             {
                 args.Display.DrawArc(_activeArc, Rhino.ApplicationSettings.AppearanceSettings.FeedbackColor);
+                args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation, 0, 1);
+                args.DrawControlPolygonLine(_editGrips[4].CurrentLocation, _editGrips[3].CurrentLocation, 4, 3);
             }
             base.OnDraw(args);
         }
