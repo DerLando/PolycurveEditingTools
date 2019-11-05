@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino.DocObjects.Custom;
+using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
 {
@@ -14,6 +15,11 @@ namespace PolycurveEditingTools.Core
         public PolycurveEditGrip()
         {
             IsActive = true;
+        }
+
+        public PolycurveEditGrip(Point3d originalLocation)
+        {
+            OriginalLocation = originalLocation;
         }
 
         public override string ShortDescription(bool plural)

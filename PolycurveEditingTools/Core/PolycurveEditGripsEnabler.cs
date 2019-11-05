@@ -8,9 +8,9 @@ using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
 {
-    internal static class PolycurveEditGripsEnabler
+    internal class PolycurveEditGripsEnabler
     {
-        public static void TurnOnGrips(RhinoObject rhObject)
+        public void TurnOnGrips(RhinoObject rhObject)
         {
             // return on null input
             if (rhObject == null) return;
