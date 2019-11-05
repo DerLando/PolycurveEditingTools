@@ -8,16 +8,16 @@ using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
 {
-    public class PolycurveEditGrip : CustomGripObject
+    class ArcEditGrip : CustomGripObject
     {
         public bool IsActive { get; set; }
 
-        public PolycurveEditGrip()
+        public ArcEditGrip()
         {
             IsActive = true;
         }
 
-        public PolycurveEditGrip(Point3d originalLocation)
+        public ArcEditGrip(Point3d originalLocation)
         {
             OriginalLocation = originalLocation;
             IsActive = true;
@@ -25,7 +25,7 @@ namespace PolycurveEditingTools.Core
 
         public override string ShortDescription(bool plural)
         {
-            return plural ? "Polycurve edit points" : "Polycurve edit point";
+            return plural ? "Arc edit points" : "Arc edit point";
         }
     }
 }

@@ -5,13 +5,15 @@ using PolycurveEditingTools.Getters;
 using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects.Custom;
+using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Commands
 {
     [Guid("BC64AD46-A6B8-403B-AC83-D6EA92E4BAA8")]
     public class pePointsOn : Command
     {
-        private PolycurveEditGripsEnabler _gripsEnabler;
+        private PolycurveEditGripsEnabler _polyGripsEnabler;
+        private ArcEditGripsEnabler _arcGripsEnabler;
 
         static pePointsOn _instance;
         public pePointsOn()
@@ -32,14 +34,20 @@ namespace PolycurveEditingTools.Commands
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            if (_gripsEnabler is null)
+            if (_polyGripsEnabler is null)
             {
-                _gripsEnabler = new PolycurveEditGripsEnabler();
-                CustomObjectGrips.RegisterGripsEnabler(_gripsEnabler.TurnOnGrips, typeof(PolycurveEditGrips));
+                _polyGripsEnabler = new PolycurveEditGripsEnabler();
+                CustomObjectGrips.RegisterGripsEnabler(_polyGripsEnabler.TurnOnGrips, typeof(PolycurveEditGrips));
+            }
+
+            if (_arcGripsEnabler is null)
+            {
+                _arcGripsEnabler = new ArcEditGripsEnabler();
+                CustomObjectGrips.RegisterGripsEnabler(_arcGripsEnabler.TurnOnGrips, typeof(ArcEditGrips));
             }
 
             var go = new GetPolycurve();
-            go.SetCommandPrompt("Select Polycurves for point display");
+            go.SetCommandPrompt("Select curves for point display");
             go.GetMultiple(1, 0);
             if (go.CommandResult() != Result.Success) return go.CommandResult();
 
@@ -48,8 +56,18 @@ namespace PolycurveEditingTools.Commands
                 var rhObject = go.Object(i).Object();
                 if (rhObject != null)
                 {
-                    if (rhObject.GripsOn) rhObject.GripsOn = false;
-                    _gripsEnabler.TurnOnGrips(rhObject);
+                    var crv = rhObject.Geometry as Curve;
+                    if (crv.GetType() == typeof(ArcCurve))
+                    {
+                        if (rhObject.GripsOn) rhObject.GripsOn = false;
+                        _arcGripsEnabler.TurnOnGrips(rhObject);
+                    }
+
+                    if (crv.GetType() == typeof(PolyCurve))
+                    {
+                        if (rhObject.GripsOn) rhObject.GripsOn = false;
+                        _polyGripsEnabler.TurnOnGrips(rhObject);
+                    }
                 }
             }
 

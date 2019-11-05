@@ -12,15 +12,11 @@ namespace PolycurveEditingTools.Core
     {
         public void TurnOnGrips(RhinoObject rhObject)
         {
-            // return on null input
-            if (rhObject == null) return;
-
             // try to cast input geometry to polycurve
-            var polyCurve = rhObject.Geometry as PolyCurve;
-            if (polyCurve == null) return;
-
+            if (!(rhObject?.Geometry is PolyCurve polyCurve)) return;
+            
             var polycurveEditGrips = new PolycurveEditGrips();
-            if(!polycurveEditGrips.CreateGrips(polyCurve)) return;
+            if (!polycurveEditGrips.CreateGrips(polyCurve)) return;
 
             rhObject.EnableCustomGrips(polycurveEditGrips);
         }

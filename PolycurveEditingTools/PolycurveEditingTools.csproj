@@ -54,9 +54,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\pePointsOn.cs" />
+    <Compile Include="Core\ArcEditGrip.cs" />
+    <Compile Include="Core\ArcEditGrips.cs" />
     <Compile Include="Core\CurveTypes.cs" />
     <Compile Include="Core\PolycurveEditGrip.cs" />
     <Compile Include="Core\PolycurveEditGrips.cs" />
+    <Compile Include="Core\ArcEditGripsEnabler.cs" />
     <Compile Include="Core\PolycurveEditGripsEnabler.cs" />
     <Compile Include="Getters\GetPolycurve.cs" />
     <Compile Include="PolycurveEditingToolsPlugIn.cs" />
