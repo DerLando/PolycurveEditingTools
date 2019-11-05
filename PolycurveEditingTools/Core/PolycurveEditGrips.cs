@@ -146,9 +146,10 @@ namespace PolycurveEditingTools.Core
                         // disable all other points for the duration of the drag
                         if (!_editgrips[j].Moved) _editgrips[j].IsActive = false;
                     }
+
+                    break;
                 }
 
-                break;
             }
 
             if (activeGripIndex == -1) return;

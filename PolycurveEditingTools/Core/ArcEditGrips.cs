@@ -49,5 +49,76 @@ namespace PolycurveEditingTools.Core
             return true;
         }
 
+        public void UpdateGrips()
+        {
+            if (!NewLocation) return;
+
+            int activeIndex = -1;
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (_editGrips[i].IsActive && _editGrips[i].Moved)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (!_editGrips[j].Moved) _editGrips[j].IsActive = false;
+                    }
+
+                    activeIndex = i;
+                    break;
+                }
+            }
+
+            // check which edit point is being dragged
+            switch (activeIndex)
+            {
+                case -1:
+                    return;
+                case 0:
+                    // point at start of arc
+                    _activeArc = new Arc(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation,
+                        _editGrips[2].CurrentLocation);
+                    break;
+                case 1:
+                    // mid-point of arc
+                    _activeArc = new Arc(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation,
+                        _editGrips[2].CurrentLocation);
+                    break;
+                case 2:
+                    // point at end of arc
+                    _activeArc = new Arc(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation,
+                        _editGrips[2].CurrentLocation);
+                    break;
+                default:
+                    throw new ArgumentException($"{activeIndex} was not between -1 and 3 :(");
+            }
+
+            _drawArc = true;
+            NewLocation = false;
+        }
+
+        protected override void OnReset()
+        {
+            _drawArc = false;
+            _activeArc = _originalArc;
+            base.OnReset();
+        }
+
+        protected override GeometryBase NewGeometry()
+        {
+            UpdateGrips();
+            if (GripsMoved && _drawArc) return new ArcCurve(_activeArc);
+            return null;
+        }
+
+        protected override void OnDraw(GripsDrawEventArgs args)
+        {
+            UpdateGrips();
+            if (_drawArc && args.DrawDynamicStuff)
+            {
+                args.Display.DrawArc(_activeArc, Rhino.ApplicationSettings.AppearanceSettings.FeedbackColor);
+            }
+            base.OnDraw(args);
+        }
     }
 }
