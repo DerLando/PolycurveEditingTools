@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rhino.Geometry;
 
 namespace PolycurveEditingTools
 {
@@ -10,5 +11,6 @@ namespace PolycurveEditingTools
     {
         public static int ArcEditGripCount = 5;
         public static int LineEditGripCount = 2;
+        public static int NurbsEditGripCount(NurbsCurve nurbs) => nurbs.GrevillePoints(false).Count + 2;
     }
 }

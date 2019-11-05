@@ -94,5 +94,43 @@ namespace PolycurveEditingTools.Core
 
             return locations;
         }
+
+        public static NurbsCurve EditNurbsCurve(NurbsCurve nurbs, int gripIndex, NurbsEditGrip[] grips)
+        {
+            var targetGripCount = Settings.NurbsEditGripCount(nurbs);
+
+            if (gripIndex < 0 || gripIndex >= targetGripCount)
+                throw new ArgumentOutOfRangeException($"Editor.EditNurbsCurve ERROR: Given grip index {gripIndex} was out of range!");
+
+            if (grips.Length != targetGripCount)
+                throw new ArgumentException($"Editor.EditNurbsCurve ERROR: Grips array was of size {grips.Length} expected array to be of size {targetGripCount}!");
+
+            var result = new NurbsCurve(nurbs);
+
+            if (gripIndex == 0)
+            {
+                // tangent handle at start
+                var startTangent = grips[1].CurrentLocation - grips[0].CurrentLocation;
+                startTangent.Unitize();
+                result.SetEndCondition(false, NurbsCurve.NurbsCurveEndConditionType.Tangency, grips[1].CurrentLocation,
+                    startTangent);
+                return result;
+            }
+
+            if (gripIndex == targetGripCount - 1)
+            {
+                // tangent handle at end
+                var endTangent = grips[targetGripCount - 1].CurrentLocation -
+                                 grips[targetGripCount - 2].CurrentLocation;
+                endTangent.Unitize();
+                result.SetEndCondition(true, NurbsCurve.NurbsCurveEndConditionType.Tangency,
+                    grips[targetGripCount - 2].CurrentLocation, endTangent);
+                return result;
+            }
+
+            // greville edit point
+            result.SetGrevillePoints(from grip in grips.Skip(1).Take(targetGripCount - 2) select grip.CurrentLocation);
+            return result;
+        }
     }
 }

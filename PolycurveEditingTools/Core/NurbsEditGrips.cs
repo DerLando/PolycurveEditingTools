@@ -45,6 +45,66 @@ namespace PolycurveEditingTools.Core
             return true;
         }
 
+        public int UpdateGrips()
+        {
+            if (!NewLocation) return -1;
+
+            int activeIndex = -1;
+
+            for (int i = 0; i < _editGrips.Length; i++)
+            {
+                if (_editGrips[i].IsActive && _editGrips[i].Moved)
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        if (!_editGrips[j].Moved) _editGrips[j].IsActive = false;
+                    }
+
+                    activeIndex = i;
+                    break;
+                }
+            }
+
+            // edit nurbs -> logic in another class
+            _activeNurbs = Editor.EditNurbsCurve(_activeNurbs, activeIndex, _editGrips);
+
+            _drawNurbs = true;
+            NewLocation = false;
+            return activeIndex;
+        }
+
+        protected override void OnReset()
+        {
+            _drawNurbs = false;
+            _activeNurbs = new NurbsCurve(_originalNurbs);
+            base.OnReset();
+        }
+
+        protected override GeometryBase NewGeometry()
+        {
+            var activeIndex = UpdateGrips();
+            if (GripsMoved && _drawNurbs)
+            {
+                // TODO: Set Gumball frame origin to new grip location
+                return _activeNurbs;
+            }
+            return null;
+        }
+
+        protected override void OnDraw(GripsDrawEventArgs args)
+        {
+            UpdateGrips();
+            if (_drawNurbs && args.DrawDynamicStuff)
+            {
+                args.Display.DrawCurve(_activeNurbs, Rhino.ApplicationSettings.AppearanceSettings.FeedbackColor);
+                args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation, 0, 1);
+                var end = _editGrips.Length - 1;
+                var start = _editGrips.Length - 2;
+                args.DrawControlPolygonLine(_editGrips[end].CurrentLocation, _editGrips[start].CurrentLocation, end, start);
+            }
+            base.OnDraw(args);
+        }
+
 
     }
 }
