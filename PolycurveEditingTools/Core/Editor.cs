@@ -132,5 +132,36 @@ namespace PolycurveEditingTools.Core
             result.SetGrevillePoints(from grip in grips.Skip(1).Take(targetGripCount - 2) select grip.CurrentLocation);
             return result;
         }
+
+        public static Point3d[] PolyCurveEditGripLocations(PolyCurve curve)
+        {
+            List<Point3d> locations = new List<Point3d>();
+
+            for (int i = 0; i < curve.SegmentCount; i++)
+            {
+                var segment = curve.SegmentCurve(i);
+
+                switch (segment.CurveType())
+                {
+                    case CurveType.LineCurve:
+                        var lineCurve = segment as LineCurve;
+                        locations.Add(lineCurve.Line.From);
+                        locations.Add(lineCurve.Line.To);
+                        break;
+                    case CurveType.ArcCurve:
+                        var arcCurve = segment as ArcCurve;
+                        locations.AddRange(ArcCurveEditGripLocations(arcCurve));
+                        break;
+                    case CurveType.NurbsCurve:
+                        var nurbsCurve = segment as NurbsCurve;
+                        locations.AddRange(NurbsCurveEditGripLocations(nurbsCurve));
+                        break;
+                    case CurveType.Undefined:
+                        break;
+                }
+            }
+
+            return locations.ToArray();
+        }
     }
 }
