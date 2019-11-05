@@ -57,6 +57,7 @@
     <Compile Include="Core\ArcEditGrip.cs" />
     <Compile Include="Core\ArcEditGrips.cs" />
     <Compile Include="Core\CurveTypes.cs" />
+    <Compile Include="Core\Editor.cs" />
     <Compile Include="Core\PolycurveEditGrip.cs" />
     <Compile Include="Core\PolycurveEditGrips.cs" />
     <Compile Include="Core\ArcEditGripsEnabler.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Getters\GetPolycurve.cs" />
     <Compile Include="PolycurveEditingToolsPlugIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\plugin-utility.ico" />

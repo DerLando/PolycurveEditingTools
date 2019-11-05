@@ -8,7 +8,7 @@ using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
 {
-    class ArcEditGrip : CustomGripObject
+    public class ArcEditGrip : CustomGripObject
     {
         public bool IsActive { get; set; }
 

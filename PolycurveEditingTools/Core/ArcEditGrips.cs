@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rhino;
 using Rhino.DocObjects.Custom;
 using Rhino.Geometry;
 
@@ -51,9 +52,9 @@ namespace PolycurveEditingTools.Core
             return true;
         }
 
-        public void UpdateGrips()
+        public int UpdateGrips()
         {
-            if (!NewLocation) return;
+            if (!NewLocation) return -1;
 
             int activeIndex = -1;
 
@@ -71,43 +72,12 @@ namespace PolycurveEditingTools.Core
                 }
             }
 
-            // check which edit point is being dragged
-            switch (activeIndex)
-            {
-                case -1:
-                    return;
-                case 0:
-                    // tangent handle at start
-                    _activeArc = new Arc(_editGrips[1].CurrentLocation,
-                        _editGrips[1].CurrentLocation - _editGrips[0].CurrentLocation, _editGrips[3].CurrentLocation);
-                    break;
-                case 1:
-                    // point at start of arc
-                    _activeArc = new Arc(_editGrips[1].CurrentLocation, _editGrips[2].CurrentLocation,
-                        _editGrips[3].CurrentLocation);
-                    break;
-                case 2:
-                    // mid-point of arc
-                    _activeArc = new Arc(_editGrips[1].CurrentLocation, _editGrips[2].CurrentLocation,
-                        _editGrips[3].CurrentLocation);
-                    break;
-                case 3:
-                    // point at end of arc
-                    _activeArc = new Arc(_editGrips[1].CurrentLocation, _editGrips[2].CurrentLocation,
-                        _editGrips[3].CurrentLocation);
-                    break;
-                case 4:
-                    // tangent handle at end
-                    _activeArc = new Arc(_editGrips[3].CurrentLocation,
-                        _editGrips[3].CurrentLocation - _editGrips[4].CurrentLocation, _editGrips[1].CurrentLocation);
-                    _activeArc = new Arc(_activeArc.EndPoint, _activeArc.MidPoint, _activeArc.StartPoint);
-                    break;
-                default:
-                    throw new ArgumentException($"{activeIndex} was not between -1 and 3 :(");
-            }
+            // edit arc -> logic in another class
+            _activeArc = Editor.EditArc(_activeArc, activeIndex, _editGrips);
 
             _drawArc = true;
             NewLocation = false;
+            return activeIndex;
         }
 
         protected override void OnReset()
@@ -119,8 +89,12 @@ namespace PolycurveEditingTools.Core
 
         protected override GeometryBase NewGeometry()
         {
-            UpdateGrips();
-            if (GripsMoved && _drawArc) return new ArcCurve(_activeArc);
+            var activeIndex = UpdateGrips();
+            if (GripsMoved && _drawArc)
+            {
+                // TODO: Set Gumball frame origin to new grip location
+                return new ArcCurve(_activeArc);
+            }
             return null;
         }
 
@@ -135,5 +109,6 @@ namespace PolycurveEditingTools.Core
             }
             base.OnDraw(args);
         }
+
     }
 }
