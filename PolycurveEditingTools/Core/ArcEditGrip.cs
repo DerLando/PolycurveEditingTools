@@ -1,26 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rhino.DocObjects.Custom;
-using Rhino.Geometry;
+﻿using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
 {
-    public class ArcEditGrip : CustomGripObject
+    public class ArcEditGrip : EditGripBase
     {
-        public bool IsActive { get; set; }
-
-        public ArcEditGrip()
+        public ArcEditGrip() : base()
         {
-            IsActive = true;
         }
 
-        public ArcEditGrip(Point3d originalLocation)
+        public ArcEditGrip(Point3d originalLocation) : base(originalLocation)
         {
-            OriginalLocation = originalLocation;
-            IsActive = true;
         }
 
         public override string ShortDescription(bool plural)

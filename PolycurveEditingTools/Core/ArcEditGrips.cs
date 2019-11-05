@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rhino;
-using Rhino.DocObjects.Custom;
+﻿using Rhino.DocObjects.Custom;
 using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
@@ -37,11 +31,11 @@ namespace PolycurveEditingTools.Core
             _activeArc = arcCrv.Arc;
 
             // set edit grips from arcCrv
-            _editGrips[0] = new ArcEditGrip(new Point3d(arcCrv.PointAtStart - arcCrv.TangentAtStart * Math.Sqrt(arcCrv.GetLength() / 1.0)));
-            _editGrips[1] = new ArcEditGrip(arcCrv.PointAtStart);
-            _editGrips[2] = new ArcEditGrip(arcCrv.Arc.MidPoint);
-            _editGrips[3] = new ArcEditGrip(arcCrv.PointAtEnd);
-            _editGrips[4] = new ArcEditGrip(new Point3d(arcCrv.PointAtEnd + arcCrv.TangentAtEnd * Math.Sqrt(arcCrv.GetLength() / 1.0)));
+            var locations = Editor.ArcCurveEditGripLocations(arcCrv);
+            for (int i = 0; i < Settings.ArcEditGripCount; i++)
+            {
+                _editGrips[i] = new ArcEditGrip(locations[i]);
+            }
 
             // Add grips
             for (int i = 0; i < 5; i++)

@@ -57,7 +57,11 @@
     <Compile Include="Core\ArcEditGrip.cs" />
     <Compile Include="Core\ArcEditGrips.cs" />
     <Compile Include="Core\CurveTypes.cs" />
+    <Compile Include="Core\EditGripBase.cs" />
     <Compile Include="Core\Editor.cs" />
+    <Compile Include="Core\NurbsEditGrip.cs" />
+    <Compile Include="Core\NurbsEditGrips.cs" />
+    <Compile Include="Core\NurbsEditGripsEnabler.cs" />
     <Compile Include="Core\PolycurveEditGrip.cs" />
     <Compile Include="Core\PolycurveEditGrips.cs" />
     <Compile Include="Core\ArcEditGripsEnabler.cs" />

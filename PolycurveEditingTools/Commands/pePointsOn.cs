@@ -14,6 +14,7 @@ namespace PolycurveEditingTools.Commands
     {
         private PolycurveEditGripsEnabler _polyGripsEnabler;
         private ArcEditGripsEnabler _arcGripsEnabler;
+        private NurbsEditGripsEnabler _nurbsGripsEnabler;
 
         static pePointsOn _instance;
         public pePointsOn()
@@ -46,6 +47,12 @@ namespace PolycurveEditingTools.Commands
                 CustomObjectGrips.RegisterGripsEnabler(_arcGripsEnabler.TurnOnGrips, typeof(ArcEditGrips));
             }
 
+            if (_nurbsGripsEnabler is null)
+            {
+                _nurbsGripsEnabler = new NurbsEditGripsEnabler();
+                CustomObjectGrips.RegisterGripsEnabler(_nurbsGripsEnabler.TurnOnGrips, typeof(NurbsEditGrips));
+            }
+
             var go = new GetPolycurve();
             go.SetCommandPrompt("Select curves for point display");
             go.GetMultiple(1, 0);
@@ -57,16 +64,23 @@ namespace PolycurveEditingTools.Commands
                 if (rhObject != null)
                 {
                     var crv = rhObject.Geometry as Curve;
-                    if (crv.GetType() == typeof(ArcCurve))
+                    var type = crv.GetType();
+                    if (type == typeof(ArcCurve))
                     {
                         if (rhObject.GripsOn) rhObject.GripsOn = false;
                         _arcGripsEnabler.TurnOnGrips(rhObject);
                     }
 
-                    if (crv.GetType() == typeof(PolyCurve))
+                    if (type == typeof(PolyCurve))
                     {
                         if (rhObject.GripsOn) rhObject.GripsOn = false;
                         _polyGripsEnabler.TurnOnGrips(rhObject);
+                    }
+
+                    if (type == typeof(NurbsCurve))
+                    {
+                        if (rhObject.GripsOn) rhObject.GripsOn = false;
+                        _nurbsGripsEnabler.TurnOnGrips(rhObject);
                     }
                 }
             }
