@@ -12,7 +12,7 @@ namespace PolycurveEditingTools.Commands
     [Guid("BC64AD46-A6B8-403B-AC83-D6EA92E4BAA8")]
     public class pePointsOn : Command
     {
-        private PolycurveEditGripsEnabler _polyGripsEnabler;
+        private PolyCurveEditGripsEnabler _polyGripsEnabler;
         private ArcEditGripsEnabler _arcGripsEnabler;
         private NurbsEditGripsEnabler _nurbsGripsEnabler;
 
@@ -37,8 +37,8 @@ namespace PolycurveEditingTools.Commands
         {
             if (_polyGripsEnabler is null)
             {
-                _polyGripsEnabler = new PolycurveEditGripsEnabler();
-                CustomObjectGrips.RegisterGripsEnabler(_polyGripsEnabler.TurnOnGrips, typeof(PolycurveEditGrips));
+                _polyGripsEnabler = new PolyCurveEditGripsEnabler();
+                CustomObjectGrips.RegisterGripsEnabler(_polyGripsEnabler.TurnOnGrips, typeof(PolyCurveEditGrips));
             }
 
             if (_arcGripsEnabler is null)

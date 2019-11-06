@@ -98,8 +98,8 @@ namespace PolycurveEditingTools.Core
             if (_drawArc && args.DrawDynamicStuff)
             {
                 args.Display.DrawArc(_activeArc, Rhino.ApplicationSettings.AppearanceSettings.FeedbackColor);
-                args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[1].CurrentLocation, 0, 1);
-                args.DrawControlPolygonLine(_editGrips[4].CurrentLocation, _editGrips[3].CurrentLocation, 4, 3);
+                args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[2].CurrentLocation, 0, 2);
+                args.DrawControlPolygonLine(_editGrips[1].CurrentLocation, _editGrips[4].CurrentLocation, 1, 4);
             }
             base.OnDraw(args);
         }

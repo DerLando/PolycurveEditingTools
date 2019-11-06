@@ -8,14 +8,14 @@ using Rhino.Geometry;
 
 namespace PolycurveEditingTools.Core
 {
-    internal class PolycurveEditGripsEnabler
+    internal class PolyCurveEditGripsEnabler
     {
         public void TurnOnGrips(RhinoObject rhObject)
         {
             // try to cast input geometry to polycurve
             if (!(rhObject?.Geometry is PolyCurve polyCurve)) return;
             
-            var polycurveEditGrips = new PolycurveEditGrips();
+            var polycurveEditGrips = new PolyCurveEditGrips();
             if (!polycurveEditGrips.CreateGrips(polyCurve)) return;
 
             rhObject.EnableCustomGrips(polycurveEditGrips);

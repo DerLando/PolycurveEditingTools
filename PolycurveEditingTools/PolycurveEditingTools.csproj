@@ -62,10 +62,10 @@
     <Compile Include="Core\NurbsEditGrip.cs" />
     <Compile Include="Core\NurbsEditGrips.cs" />
     <Compile Include="Core\NurbsEditGripsEnabler.cs" />
-    <Compile Include="Core\PolycurveEditGrip.cs" />
-    <Compile Include="Core\PolycurveEditGrips.cs" />
+    <Compile Include="Core\PolyCurveEditGrip.cs" />
     <Compile Include="Core\ArcEditGripsEnabler.cs" />
-    <Compile Include="Core\PolycurveEditGripsEnabler.cs" />
+    <Compile Include="Core\PolyCurveEditGrips.cs" />
+    <Compile Include="Core\PolyCurveEditGripsEnabler.cs" />
     <Compile Include="Getters\GetPolycurve.cs" />
     <Compile Include="PolycurveEditingToolsPlugIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -31,29 +31,20 @@ namespace PolycurveEditingTools.Core
             {
                 case 0:
                     // tangent handle at start
-                    result = new Arc(grips[1].CurrentLocation,
-                        grips[1].CurrentLocation - grips[0].CurrentLocation, grips[3].CurrentLocation);
+                    result = new Arc(grips[2].CurrentLocation,
+                        grips[2].CurrentLocation - grips[0].CurrentLocation, grips[4].CurrentLocation);
                     break;
                 case 1:
-                    // point at start of arc
-                    result = new Arc(grips[1].CurrentLocation, grips[2].CurrentLocation,
-                        grips[3].CurrentLocation);
-                    break;
-                case 2:
-                    // mid-point of arc
-                    result = new Arc(grips[1].CurrentLocation, grips[2].CurrentLocation,
-                        grips[3].CurrentLocation);
-                    break;
-                case 3:
-                    // point at end of arc
-                    result = new Arc(grips[1].CurrentLocation, grips[2].CurrentLocation,
-                        grips[3].CurrentLocation);
-                    break;
-                case 4:
                     // tangent handle at end
-                    result = new Arc(grips[3].CurrentLocation,
-                        grips[3].CurrentLocation - grips[4].CurrentLocation, grips[1].CurrentLocation);
+                    result = new Arc(grips[4].CurrentLocation,
+                        grips[4].CurrentLocation - grips[1].CurrentLocation, grips[2].CurrentLocation);
                     result = new Arc(result.EndPoint, result.MidPoint, result.StartPoint);
+                    break;
+                case 2: // point at start of arc
+                case 3: // mid-point of arc
+                case 4: // point at end of arc
+                    result = new Arc(grips[2].CurrentLocation, grips[3].CurrentLocation,
+                        grips[4].CurrentLocation);
                     break;
             }
 
@@ -70,10 +61,10 @@ namespace PolycurveEditingTools.Core
             var locations = new Point3d[Settings.ArcEditGripCount];
             // set edit grips locations from arcCrv
             locations[0] = new Point3d(arcCrv.PointAtStart - arcCrv.TangentAtStart * Math.Sqrt(arcCrv.GetLength() / 1.0));
-            locations[1] = arcCrv.PointAtStart;
-            locations[2] = arcCrv.Arc.MidPoint;
-            locations[3] = arcCrv.PointAtEnd;
-            locations[4] = new Point3d(arcCrv.PointAtEnd + arcCrv.TangentAtEnd * Math.Sqrt(arcCrv.GetLength() / 1.0));
+            locations[1] = new Point3d(arcCrv.PointAtEnd + arcCrv.TangentAtEnd * Math.Sqrt(arcCrv.GetLength() / 1.0));
+            locations[2] = arcCrv.PointAtStart;
+            locations[3] = arcCrv.Arc.MidPoint;
+            locations[4] = arcCrv.PointAtEnd;
 
             return locations;
         }
@@ -162,6 +153,19 @@ namespace PolycurveEditingTools.Core
             }
 
             return locations.ToArray();
+        }
+
+        public static PolyCurve EditPolyCurve(PolyCurve curve, int gripIndex, PolyCurveEditGrip[] grips)
+        {
+            var targetGripCount = grips.Length;
+
+            if (gripIndex < 0 || gripIndex >= targetGripCount)
+                throw new ArgumentOutOfRangeException($"Editor.EditPolyCurve ERROR: Given grip index {gripIndex} was out of range!");
+
+            if (grips.Length != targetGripCount)
+                throw new ArgumentException($"Editor.EditPolyCurve ERROR: Grips array was of size {grips.Length} expected array to be of size {targetGripCount}!");
+
+            return curve;
         }
     }
 }
