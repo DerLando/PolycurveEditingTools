@@ -76,11 +76,11 @@ namespace PolycurveEditingTools.Core
             var locations = new Point3d[greville.Count + 2];
 
             locations[0] = new Point3d(nurbs.PointAtStart - nurbs.TangentAtStart * Math.Sqrt(nurbs.GetLength()));
-            locations[locations.Length - 1] = new Point3d(nurbs.PointAtEnd + nurbs.TangentAtEnd * Math.Sqrt(nurbs.GetLength()));
+            locations[1] = new Point3d(nurbs.PointAtEnd + nurbs.TangentAtEnd * Math.Sqrt(nurbs.GetLength()));
 
             for (int i = 0; i < greville.Count; i++)
             {
-                locations[i + 1] = greville[i];
+                locations[i + 2] = greville[i];
             }
 
             return locations;
@@ -101,26 +101,26 @@ namespace PolycurveEditingTools.Core
             if (gripIndex == 0)
             {
                 // tangent handle at start
-                var startTangent = grips[1].CurrentLocation - grips[0].CurrentLocation;
+                var startTangent = grips[2].CurrentLocation - grips[0].CurrentLocation;
                 startTangent.Unitize();
-                result.SetEndCondition(false, NurbsCurve.NurbsCurveEndConditionType.Tangency, grips[1].CurrentLocation,
+                result.SetEndCondition(false, NurbsCurve.NurbsCurveEndConditionType.Tangency, grips[2].CurrentLocation,
                     startTangent);
                 return result;
             }
 
-            if (gripIndex == targetGripCount - 1)
+            if (gripIndex == 1)
             {
                 // tangent handle at end
-                var endTangent = grips[targetGripCount - 1].CurrentLocation -
-                                 grips[targetGripCount - 2].CurrentLocation;
+                var endTangent = grips[1].CurrentLocation -
+                                 grips[targetGripCount - 1].CurrentLocation;
                 endTangent.Unitize();
                 result.SetEndCondition(true, NurbsCurve.NurbsCurveEndConditionType.Tangency,
-                    grips[targetGripCount - 2].CurrentLocation, endTangent);
+                    grips[targetGripCount - 1].CurrentLocation, endTangent);
                 return result;
             }
 
             // greville edit point
-            result.SetGrevillePoints(from grip in grips.Skip(1).Take(targetGripCount - 2) select grip.CurrentLocation);
+            result.SetGrevillePoints(from grip in grips.Skip(2) select grip.CurrentLocation);
             return result;
         }
 

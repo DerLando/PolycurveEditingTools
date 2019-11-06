@@ -95,11 +95,13 @@ namespace PolycurveEditingTools.Core
         protected override void OnDraw(GripsDrawEventArgs args)
         {
             UpdateGrips();
+
+            args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[2].CurrentLocation, 0, 2);
+            args.DrawControlPolygonLine(_editGrips[1].CurrentLocation, _editGrips[4].CurrentLocation, 1, 4);
+
             if (_drawArc && args.DrawDynamicStuff)
             {
                 args.Display.DrawArc(_activeArc, Rhino.ApplicationSettings.AppearanceSettings.FeedbackColor);
-                args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[2].CurrentLocation, 0, 2);
-                args.DrawControlPolygonLine(_editGrips[1].CurrentLocation, _editGrips[4].CurrentLocation, 1, 4);
             }
             base.OnDraw(args);
         }
