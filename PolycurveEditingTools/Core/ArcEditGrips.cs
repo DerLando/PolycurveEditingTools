@@ -66,6 +66,8 @@ namespace PolycurveEditingTools.Core
                 }
             }
 
+            if (activeIndex == -1) return activeIndex;
+
             // edit arc -> logic in another class
             _activeArc = Editor.EditArc(_activeArc, activeIndex, _editGrips);
 

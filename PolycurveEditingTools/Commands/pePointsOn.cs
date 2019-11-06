@@ -15,6 +15,7 @@ namespace PolycurveEditingTools.Commands
         private PolyCurveEditGripsEnabler _polyGripsEnabler;
         private ArcEditGripsEnabler _arcGripsEnabler;
         private NurbsEditGripsEnabler _nurbsGripsEnabler;
+        private LineEditGripsEnabler _lineGripsEnabler;
 
         static pePointsOn _instance;
         public pePointsOn()
@@ -53,6 +54,12 @@ namespace PolycurveEditingTools.Commands
                 CustomObjectGrips.RegisterGripsEnabler(_nurbsGripsEnabler.TurnOnGrips, typeof(NurbsEditGrips));
             }
 
+            if (_lineGripsEnabler is null)
+            {
+                _lineGripsEnabler = new LineEditGripsEnabler();
+                CustomObjectGrips.RegisterGripsEnabler(_lineGripsEnabler.TurnOnGrips, typeof(LineEditGrips));
+            }
+
             var go = new GetPolycurve();
             go.SetCommandPrompt("Select curves for point display");
             go.GetMultiple(1, 0);
@@ -69,18 +76,28 @@ namespace PolycurveEditingTools.Commands
                     {
                         if (rhObject.GripsOn) rhObject.GripsOn = false;
                         _arcGripsEnabler.TurnOnGrips(rhObject);
+                        continue;
                     }
 
                     if (type == typeof(PolyCurve))
                     {
                         if (rhObject.GripsOn) rhObject.GripsOn = false;
                         _polyGripsEnabler.TurnOnGrips(rhObject);
+                        continue;
                     }
 
                     if (type == typeof(NurbsCurve))
                     {
                         if (rhObject.GripsOn) rhObject.GripsOn = false;
                         _nurbsGripsEnabler.TurnOnGrips(rhObject);
+                        continue;
+                    }
+
+                    if (type == typeof(LineCurve))
+                    {
+                        if (rhObject.GripsOn) rhObject.GripsOn = false;
+                        _lineGripsEnabler.TurnOnGrips(rhObject);
+                        continue;
                     }
                 }
             }

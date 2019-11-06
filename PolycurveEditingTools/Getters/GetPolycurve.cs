@@ -14,7 +14,7 @@ namespace PolycurveEditingTools.Getters
         public override bool CustomGeometryFilter(RhinoObject rhObject, GeometryBase geometry, ComponentIndex componentIndex)
         {
             var type = geometry.GetType();
-            return type == typeof(PolyCurve) | type == typeof(ArcCurve) | type == typeof(NurbsCurve);
+            return type == typeof(PolyCurve) | type == typeof(ArcCurve) | type == typeof(NurbsCurve) | type == typeof(LineCurve);
         }
     }
 }

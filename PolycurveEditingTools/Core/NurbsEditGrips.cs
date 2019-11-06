@@ -65,6 +65,8 @@ namespace PolycurveEditingTools.Core
                 }
             }
 
+            if (activeIndex == -1) return activeIndex;
+
             // edit nurbs -> logic in another class
             _activeNurbs = Editor.EditNurbsCurve(_activeNurbs, activeIndex, _editGrips);
 

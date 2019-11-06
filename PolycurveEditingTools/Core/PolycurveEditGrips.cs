@@ -94,6 +94,42 @@ namespace PolycurveEditingTools.Core
             // change curve segments to new cp location
             _activePolycurve = Editor.EditPolyCurve(_activePolycurve, activeGripIndex, _editGrips);
 
+            _drawPolycurve = true;
+            NewLocation = false;
+        }
+
+        protected override void OnReset()
+        {
+            _drawPolycurve = false;
+            _activePolycurve = _originalPolycurve.DuplicatePolyCurve();
+            base.OnReset();
+        }
+
+        protected override GeometryBase NewGeometry()
+        {
+            UpdateGrips();
+            if (GripsMoved && _drawPolycurve)
+            {
+                // TODO: Set Gumball frame origin to new grip location
+                return _activePolycurve;
+            }
+            return null;
+        }
+
+        protected override void OnDraw(GripsDrawEventArgs args)
+        {
+            UpdateGrips();
+
+            //args.DrawControlPolygonLine(_editGrips[0].CurrentLocation, _editGrips[2].CurrentLocation, 0, 2);
+            //var end = 1;
+            //var start = _editGrips.Length - 1;
+            //args.DrawControlPolygonLine(_editGrips[end].CurrentLocation, _editGrips[start].CurrentLocation, end, start);
+
+            if (_drawPolycurve && args.DrawDynamicStuff)
+            {
+                args.Display.DrawCurve(_activePolycurve, Rhino.ApplicationSettings.AppearanceSettings.FeedbackColor);
+            }
+            base.OnDraw(args);
         }
     }
 }

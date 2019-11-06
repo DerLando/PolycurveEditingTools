@@ -10,7 +10,7 @@ namespace PolycurveEditingTools
     public static class Settings
     {
         public static int ArcEditGripCount = 5;
-        public static int LineEditGripCount = 2;
+        public static int LineEditGripCount = 4;
         public static int NurbsEditGripCount(NurbsCurve nurbs) => nurbs.GrevillePoints(false).Count + 2;
     }
 }
