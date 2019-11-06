@@ -70,6 +70,38 @@ namespace PolycurveEditingTools.Core
             return locations;
         }
 
+        public static Arc EditArcCurveTooManyGrips(ArcCurve crv, int gripIndex, EditGripBase[] grips)
+        {
+            // get target location
+            var locations = ArcCurveEditGripLocations(crv);
+
+            // empty correct grips array
+            var correctGrips = new EditGripBase[locations.Length];
+            var tol = RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var correctGripIndex = -1;
+
+            for (int i = 0; i < correctGrips.Length; i++)
+            {
+                for (int j = 0; j < grips.Length; j++)
+                {
+                    if (!locations[i].EpsilonEquals(grips[j].CurrentLocation, tol)) continue;
+                    correctGrips[i] = grips[j];
+                }
+            }
+
+            for (int i = 0; i < correctGrips.Length; i++)
+            {
+                if (correctGrips[i] != null) continue;
+
+                correctGrips[i] = grips.First(g => g.Moved);
+                correctGripIndex = i;
+            }
+
+            if(correctGripIndex == -1) throw new ArgumentOutOfRangeException($"Editor.ArcCurveEditTooManyGrips ERROR: Could not determine correct grip index!");
+
+            return EditArc(crv.Arc, correctGripIndex, correctGrips);
+        }
+
         public static Point3d[] LineCurveEditGripLocations(LineCurve lineCrv)
         {
             var locations = new Point3d[Settings.LineEditGripCount];
@@ -111,6 +143,38 @@ namespace PolycurveEditingTools.Core
             }
 
             return result;
+        }
+
+        public static Line EditLineCurveTooManyGrips(LineCurve crv, int gripIndex, EditGripBase[] grips)
+        {
+            // get target location
+            var locations = LineCurveEditGripLocations(crv);
+
+            // empty correct grips array
+            var correctGrips = new EditGripBase[locations.Length];
+            var tol = RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var correctGripIndex = -1;
+
+            for (int i = 0; i < correctGrips.Length; i++)
+            {
+                for (int j = 0; j < grips.Length; j++)
+                {
+                    if (!locations[i].EpsilonEquals(grips[j].CurrentLocation, tol)) continue;
+                    correctGrips[i] = grips[j];
+                }
+            }
+
+            for (int i = 0; i < correctGrips.Length; i++)
+            {
+                if (correctGrips[i] != null) continue;
+
+                correctGrips[i] = grips.First(g => g.Moved);
+                correctGripIndex = i;
+            }
+
+            if (correctGripIndex == -1) throw new ArgumentOutOfRangeException($"Editor.LineCurveEditTooManyGrips ERROR: Could not determine correct grip index!");
+
+            return EditLine(crv.Line, correctGripIndex, correctGrips);
         }
 
         public static Point3d[] NurbsCurveEditGripLocations(NurbsCurve nurbs)
@@ -168,6 +232,38 @@ namespace PolycurveEditingTools.Core
             return result;
         }
 
+        public static NurbsCurve EditNurbsCurveTooManyGrips(NurbsCurve crv, int gripIndex, EditGripBase[] grips)
+        {
+            // get target location
+            var locations = NurbsCurveEditGripLocations(crv);
+
+            // empty correct grips array
+            var correctGrips = new EditGripBase[locations.Length];
+            var tol = RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            var correctGripIndex = -1;
+
+            for (int i = 0; i < correctGrips.Length; i++)
+            {
+                for (int j = 0; j < grips.Length; j++)
+                {
+                    if (!locations[i].EpsilonEquals(grips[j].CurrentLocation, tol)) continue;
+                    correctGrips[i] = grips[j];
+                }
+            }
+
+            for (int i = 0; i < correctGrips.Length; i++)
+            {
+                if (correctGrips[i] != null) continue;
+
+                correctGrips[i] = grips.First(g => g.Moved);
+                correctGripIndex = i;
+            }
+
+            if (correctGripIndex == -1) throw new ArgumentOutOfRangeException($"Editor.ArcCurveEditTooManyGrips ERROR: Could not determine correct grip index!");
+
+            return EditNurbsCurve(crv, correctGripIndex, correctGrips);
+        }
+
         public static Point3d[] PolyCurveEditGripLocations(PolyCurve curve)
         {
             List<Point3d> locations = new List<Point3d>();
@@ -180,7 +276,7 @@ namespace PolycurveEditingTools.Core
                 {
                     case CurveType.LineCurve:
                         var lineCurve = segment as LineCurve;
-                        locations.Add(lineCurve.Line.From);
+                        locations.AddRange(LineCurveEditGripLocations(lineCurve).Take(Settings.LineEditGripCount - 1));
                         // omit end point, as start of next curve will be the same location
                         break;
                     case CurveType.ArcCurve:
@@ -223,7 +319,7 @@ namespace PolycurveEditingTools.Core
                 switch (segments[i].CurveType())
                 {
                     case CurveType.LineCurve:
-                        gripCount += 1;
+                        gripCount += Settings.LineEditGripCount - 1;
                         break;
                     case CurveType.ArcCurve:
                         gripCount += Settings.ArcEditGripCount - 1;
@@ -286,6 +382,20 @@ namespace PolycurveEditingTools.Core
 
             var segments = curve.DuplicateSegments();
 
+            // check trivial gripcount
+            if (gripIndex == grips.Length - 1 && !curve.IsClosed)
+            {
+                curve.SetEndPoint(grips[gripIndex].CurrentLocation);
+                return curve;
+            }
+
+            if (gripIndex == 2)
+            {
+                curve.SetStartPoint(grips[gripIndex].CurrentLocation);
+                return curve;
+            }
+
+            bool lastSegment = true;
             int gripCount = 0;
             for (int i = 0; i < segments.Length; i++)
             {
@@ -294,23 +404,45 @@ namespace PolycurveEditingTools.Core
                 switch (segments[i].CurveType())
                 {
                     case CurveType.LineCurve:
-                        curGripCount += Settings.LineEditGripCount - 1;
-                        if (gripIndex == gripCount) segments[i].SetStartPoint(grips[gripIndex].CurrentLocation);
-                        break;
-                    case CurveType.ArcCurve:
-                        curGripCount += Settings.ArcEditGripCount - 1;
+                        curGripCount = Settings.LineEditGripCount - 1;
                         if (gripIndex >= gripCount && gripIndex <= gripCount + curGripCount)
                         {
-                            segments[i] = new ArcCurve(EditArc((segments[i] as ArcCurve).Arc, gripIndex - gripCount,
-                                grips.Skip(gripCount).Take(curGripCount).ToArray()));
+                            segments[i] = new LineCurve(EditLineCurveTooManyGrips(segments[i] as LineCurve, gripIndex, grips));
+                            //var editGrips = grips.Skip(gripCount).Take(curGripCount).ToList();
+                            //editGrips.Add(grips[gripCount + curGripCount + 2]);
+                            
+                            //segments[i] = new LineCurve(EditLine((segments[i] as LineCurve).Line, gripIndex - gripCount,
+                            //    editGrips.ToArray()));
+
+                            lastSegment = false;
+                        }
+                        break;
+                    case CurveType.ArcCurve:
+                        curGripCount = Settings.ArcEditGripCount - 1;
+                        if (gripIndex >= gripCount && gripIndex <= gripCount + curGripCount)
+                        {
+                            segments[i] = new ArcCurve(EditArcCurveTooManyGrips(segments[i] as ArcCurve, gripIndex, grips));
+                            //var editGrips = grips.Skip(gripCount).Take(curGripCount).ToList();
+                            //editGrips.Add(grips[gripCount + curGripCount + 2]);
+
+                            //segments[i] = new ArcCurve(EditArc((segments[i] as ArcCurve).Arc, gripIndex - gripCount,
+                            //    editGrips.ToArray()));
+
+                            lastSegment = false;
                         }
                         break;
                     case CurveType.NurbsCurve:
-                        curGripCount += Settings.NurbsEditGripCount(segments[i] as NurbsCurve) - 1;
+                        curGripCount = Settings.NurbsEditGripCount(segments[i] as NurbsCurve) - 1;
                         if (gripIndex >= gripCount && gripIndex <= gripCount + curGripCount)
                         {
-                            segments[i] = EditNurbsCurve(segments[i] as NurbsCurve, gripIndex - gripCount,
-                                grips.Skip(gripCount).Take(curGripCount).ToArray());
+                            segments[i] = EditNurbsCurveTooManyGrips(segments[i] as NurbsCurve, gripIndex, grips);
+                            //var editGrips = grips.Skip(gripCount).Take(curGripCount).ToList();
+                            //editGrips.Add(grips[gripCount + curGripCount + 2]);
+
+                            //segments[i] = EditNurbsCurve(segments[i] as NurbsCurve, gripIndex - gripCount,
+                            //    editGrips.ToArray());
+
+                            lastSegment = false;
                         }
                         break;
                     case CurveType.Undefined:
@@ -318,6 +450,24 @@ namespace PolycurveEditingTools.Core
                 }
 
                 gripCount += curGripCount;
+            }
+
+            if (lastSegment)
+            {
+                int lastIndex = segments.Length - 1;
+                switch (segments[lastIndex].CurveType())
+                {
+                    case CurveType.LineCurve:
+                        break;
+                    case CurveType.ArcCurve:
+                        break;
+                    case CurveType.NurbsCurve:
+                        break;
+                    case CurveType.PolylineCurve:
+                        break;
+                    case CurveType.Undefined:
+                        break;
+                }
             }
 
             var joined = Curve.JoinCurves(segments, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);

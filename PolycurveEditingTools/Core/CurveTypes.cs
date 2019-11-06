@@ -7,6 +7,7 @@ namespace PolycurveEditingTools.Core
         LineCurve,
         ArcCurve,
         NurbsCurve,
+        PolylineCurve,
         Undefined,
     }
 
@@ -18,7 +19,9 @@ namespace PolycurveEditingTools.Core
 
             if (type == typeof(LineCurve)) return Core.CurveType.LineCurve;
             if (type == typeof(ArcCurve)) return Core.CurveType.ArcCurve;
-            return Core.CurveType.NurbsCurve;
+            if (type == typeof(PolylineCurve)) return Core.CurveType.PolylineCurve;
+            if (type == typeof(NurbsCurve)) return Core.CurveType.NurbsCurve;
+            return Core.CurveType.Undefined;
         }
     }
 }
